@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: go-app
-        image: amirul135/go-config-secrets-demo:1.0
+        image: amirul135/go-config-secret-demo:1.0
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
