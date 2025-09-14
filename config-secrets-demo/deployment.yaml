@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-config-secrets-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-config-secrets-demo
+  template:
+    metadata:
+      labels:
+        app: go-config-secrets-demo
+    spec:
+      containers:
+      - name: go-app
+        image: amirul135/go-config-secrets-demo:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: go-app-config
+        - secretRef:
+            name: go-db-credentials
+        volumeMounts:
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: go-db-credentials
