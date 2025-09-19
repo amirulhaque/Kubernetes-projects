@@ -1,11 +1,16 @@
 #!/bin/sh
 
-# Generate runtime env config file
-cat <<EOF > /usr/share/nginx/html/env-config.js
-window._env_ = {
-  REACT_APP_API_URL: "$REACT_APP_API_URL"
-}
-EOF
+# Generate env-config.js dynamically
+echo "window._env_ = {" > /usr/share/nginx/html/env-config.js
 
-# Start nginx
+# Add variables (all prefixed REACT_APP_)
+for var in $(env | grep REACT_APP_); do
+  key=$(echo $var | cut -d= -f1)
+  value=$(echo $var | cut -d= -f2-)
+  echo " \"$key\": \"$value\"," >> /usr/share/nginx/html/env-config.js
+done
+
+# Close object
+echo "}" >> /usr/share/nginx/html/env-config.js
+
 exec "$@"
