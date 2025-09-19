@@ -1,17 +1,22 @@
-# Build stage
-FROM node:18-alpine as build
+# Step 1: Build React app
+FROM node:18 AS build
 WORKDIR /app
-COPY package.json ./
+COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
 
-# Runtime stage
+# Step 2: Nginx for serving static files
 FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
+WORKDIR /usr/share/nginx/html
 
-# Copy env.sh for runtime injection
+# Copy built React files
+COPY --from=build /app/build .
+
+# Copy entrypoint script that injects env vars
 COPY env.sh /docker-entrypoint.d/env.sh
+
+# Make sure script is executable
 RUN chmod +x /docker-entrypoint.d/env.sh
 
 EXPOSE 80
