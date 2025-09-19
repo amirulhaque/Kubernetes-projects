@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: your-dockerhub-username/react-frontend:latest
+          image: amirul135/frontend:latest
           env:
             - name: REACT_APP_API_URL
               value: http://backend-service:3000
