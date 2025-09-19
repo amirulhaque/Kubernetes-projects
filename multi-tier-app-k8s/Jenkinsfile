@@ -49,8 +49,9 @@ pipeline {
                     kubectl apply -f multi-tier-app-k8s/k8s-manifests/namespace.yaml
                     kubectl apply -f multi-tier-app-k8s/k8s-manifests/
                  """
-            }
-            }
+                   }
+            }  
         }
     }
+}
 }
