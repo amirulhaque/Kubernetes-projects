@@ -12,6 +12,7 @@ grafana:
       - ReadWriteOnce
 
 prometheus:
+  enabled: true
   service:
     type: NodePort
     nodePort: 32001 # access Prometheus at http://<EC2-IP>:32001
