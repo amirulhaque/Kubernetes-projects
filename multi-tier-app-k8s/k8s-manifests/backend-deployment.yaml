@@ -16,6 +16,7 @@ spec:
       containers:
         - name: backend
           image: amirul135/backend:latest
+          imagePullPolicy: Always
           env:
             - name: DB_HOST
               value: mysql-service
