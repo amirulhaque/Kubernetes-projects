@@ -40,10 +40,14 @@ kind: Service
 metadata:
   name: mysql-service
   namespace: three-tier-app
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3306"
+    prometheus.io/path: "/metrics"
 spec:
   selector:
     app: mysql
   ports:
     - port: 3306
       targetPort: 3306
-  clusterIP: None # Headless service
+  type: ClusterIP # Headless service
