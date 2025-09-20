@@ -28,10 +28,15 @@ kind: Service
 metadata:
   name: frontend-service
   namespace: three-tier-app
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
+    prometheus.io/path: "/metrics"
 spec:
   selector:
     app: frontend
   ports:
     - port: 80
       targetPort: 80
+      nodePort: 30081
   type: NodePort # Use LoadBalancer in cloud
