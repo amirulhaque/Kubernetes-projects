@@ -1,17 +1,18 @@
-apiVersion: v1
-kind: Service
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
 metadata:
-  name: frontend-service
+  name: frontend-servicemonitor
+  namespace: monitoring
   labels:
-    app: frontend
-  annotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "80"
-    prometheus.io/path: "/metrics"
+    release: kube-prom-stack # must match Helm release
 spec:
   selector:
-    app: frontend
-  ports:
+    matchLabels:
+      app: frontend
+  namespaceSelector:
+    matchNames:
+      - three-tier-app
+  endpoints:
     - port: 80
-      targetPort: 80
-  type: ClusterIP
+      path: /metrics
+      interval: 15s
