@@ -4,24 +4,9 @@ grafana:
   service:
     type: NodePort
     nodePort: 32000 # access Grafana at http://<EC2-IP>:32000
-  persistence:
-    enabled: false
-    size: 1Gi
-    storageClassName: gp2 # or gp3 if available in your AWS region
-    accessModes:
-      - ReadWriteOnce
 
 prometheus:
   enabled: true
   service:
     type: NodePort
     nodePort: 32001 # access Prometheus at http://<EC2-IP>:32001
-  prometheusSpec:
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 1Gi
-          storageClassName: gp2 # or gp3
