@@ -4,15 +4,15 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
-// Allow requests from frontend
-// Enable CORS
+// Enable CORS for your frontend
 app.use(cors({
-    origin: "http://35.175.222.149:30860", // frontend NodePort
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+  origin: "http://35.175.222.149:30860", // frontend NodePort
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// app.use(cors());
+// Explicitly handle preflight requests
+app.options('*', cors());
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST || 'localhost',
