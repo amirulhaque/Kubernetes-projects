@@ -16,6 +16,7 @@ spec:
       containers:
         - name: frontend
           image: amirul135/frontend:latest
+          imagePullPolicy: Always
           env:
             - name: REACT_APP_API_URL
               value: http://35.175.222.149:30080
