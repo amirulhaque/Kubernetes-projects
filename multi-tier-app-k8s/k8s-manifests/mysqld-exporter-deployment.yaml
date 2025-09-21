@@ -30,5 +30,4 @@ spec:
             - "--collect.global_variables"
             - "--collect.info_schema.tables"
             - "--collect.info_schema.processlist"
-            - "--collect.performance_schema.eventsstatements"
             - "--collect.auto_increment.columns"
