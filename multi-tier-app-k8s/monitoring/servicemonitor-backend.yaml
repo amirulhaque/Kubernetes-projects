@@ -11,8 +11,8 @@ spec:
       app: backend
   namespaceSelector:
     matchNames:
-      - three-tier-app # fix typo here
+      - three-tier-app
   endpoints:
-    - port: 3000 # matches internal ClusterIP service
+    - port: http # ✅ use the port name as string
       path: /metrics
       interval: 15s
