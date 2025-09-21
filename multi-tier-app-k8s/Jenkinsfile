@@ -51,6 +51,8 @@ pipeline {
                     kubectl apply -f multi-tier-app-k8s/k8s-manifests/mysql-deployment.yaml
                     kubectl apply -f multi-tier-app-k8s/k8s-manifests/backend-deployment.yaml
                     kubectl apply -f multi-tier-app-k8s/k8s-manifests/front-end-deployment.yaml
+                    kubectl -n three-tier-app rollout restart deploy backend
+                    kubectl -n three-tier-app rollout restart deploy frontend
                  """
                    }
                 }  
