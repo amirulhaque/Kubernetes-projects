@@ -4,12 +4,15 @@ kind: Service
 metadata:
   name: backend-service-internal
   namespace: three-tier-app
+  labels:
+    app: backend
 spec:
   selector:
     app: backend
   ports:
-    - port: 3000 # internal port
-      targetPort: 3000 # pod port
+    - name: http # ✅ add port name
+      port: 3000
+      targetPort: 3000
   type: ClusterIP
 
 ---
