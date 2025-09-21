@@ -1,0 +1,45 @@
+# backend internal service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service-internal
+  namespace: three-tier-app
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 3000 # internal port
+      targetPort: 3000 # pod port
+  type: ClusterIP
+
+---
+
+# frontend internal service (optional)
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service-internal
+  namespace: three-tier-app
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+
+---
+
+# MySQL internal service (already ClusterIP, optional rename)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service-internal
+  namespace: three-tier-app
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP
