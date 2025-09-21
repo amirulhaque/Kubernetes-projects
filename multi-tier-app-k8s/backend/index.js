@@ -6,7 +6,7 @@ const PORT = 3000;
 
 // Enable CORS for your frontend
 app.use(cors({
-  origin: "http://54.147.219.150:30081", // frontend NodePort
+  origin: "http://52.23.161.111:30081", // frontend NodePort
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
