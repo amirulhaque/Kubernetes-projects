@@ -16,6 +16,9 @@ spec:
       containers:
         - name: mysqld-exporter
           image: prom/mysqld-exporter:v0.17.0
+          args:
+            - "--config.my-cnf="
+            - "--datasource=$(DATA_SOURCE_NAME)"
           ports:
             - name: metrics
               containerPort: 9104
@@ -25,9 +28,3 @@ spec:
                 secretKeyRef:
                   name: mysql-exporter-secret
                   key: DATA_SOURCE_NAME
-          args:
-            - "--collect.global_status"
-            - "--collect.global_variables"
-            - "--collect.info_schema.tables"
-            - "--collect.info_schema.processlist"
-            - "--collect.auto_increment.columns"
