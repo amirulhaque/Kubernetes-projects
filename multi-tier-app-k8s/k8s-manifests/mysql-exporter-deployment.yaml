@@ -15,10 +15,10 @@ spec:
     spec:
       containers:
         - name: mysqld-exporter
-          image: prom/mysqld-exporter:latest
+          image: prom/mysqld-exporter:v0.17.0
+          ports:
+            - name: metrics
+              containerPort: 9104
           env:
             - name: DATA_SOURCE_NAME
-              value: "exporter:exporterpass@tcp(mysql-service-internal:3306)/mydb"
-          ports:
-            - containerPort: 9104
-              name: metrics
+              value: "exporter:exporterpass@(mysql:3306)/"
