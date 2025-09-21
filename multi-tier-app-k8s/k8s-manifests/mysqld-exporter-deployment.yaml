@@ -25,3 +25,10 @@ spec:
                 secretKeyRef:
                   name: mysql-exporter-secret
                   key: DATA_SOURCE_NAME
+          args:
+            - "--collect.global_status"
+            - "--collect.global_variables"
+            - "--collect.info_schema.tables"
+            - "--collect.info_schema.processlist"
+            - "--collect.performance_schema.eventsstatements"
+            - "--collect.auto_increment.columns"
