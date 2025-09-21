@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const client = require('prom-client'); // ✅ Add Prometheus client
 const app = express();
 const PORT = 3000;
 
@@ -14,6 +15,20 @@ app.use(cors({
 // Explicitly handle preflight requests
 app.options('*', cors());
 
+// Prometheus metrics setup
+const requestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route']
+});
+
+// Middleware to count requests
+app.use((req, res, next) => {
+  requestCounter.labels(req.method, req.path).inc();
+  next();
+});
+
+// MySQL connection
 const db = mysql.createConnection({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'myuser',
@@ -29,6 +44,7 @@ db.connect(err => {
   console.log('✅ Connected to MySQL database');
 });
 
+// Routes
 app.get('/', (req, res) => {
   res.send('Hello from Backend API!');
 });
@@ -41,6 +57,12 @@ app.get('/users', (req, res) => {
     }
     res.json(results);
   });
+});
+
+// Prometheus metrics endpoint
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
 });
 
 app.listen(PORT, () => {
