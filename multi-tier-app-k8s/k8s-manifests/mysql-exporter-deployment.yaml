@@ -18,7 +18,7 @@ spec:
           image: prom/mysqld-exporter:latest
           env:
             - name: DATA_SOURCE_NAME
-              value: "myuser:mypass@tcp(mysql-service-internal:3306)/mydb"
+              value: "exporter:exporterpass@tcp(mysql-service-internal:3306)/mydb"
           ports:
             - containerPort: 9104
               name: metrics
