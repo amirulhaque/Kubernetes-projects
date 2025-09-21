@@ -19,7 +19,7 @@ spec:
           imagePullPolicy: Always
           env:
             - name: REACT_APP_API_URL
-              value: http://54.147.219.150:30080
+              value: http://52.23.161.111:30080
           ports:
             - containerPort: 80
 ---
