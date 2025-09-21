@@ -21,4 +21,4 @@ spec:
               containerPort: 9104
           env:
             - name: DATA_SOURCE_NAME
-              value: "exporter:exporterpass@(mysql:3306)/"
+              value: "exporter:exporterpass@(mysql-service-internal:3306)/"
