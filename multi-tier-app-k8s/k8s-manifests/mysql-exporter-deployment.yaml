@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysqld-exporter
+  namespace: three-tier-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysqld-exporter
+  template:
+    metadata:
+      labels:
+        app: mysqld-exporter
+    spec:
+      containers:
+        - name: mysqld-exporter
+          image: prom/mysqld-exporter:latest
+          env:
+            - name: DATA_SOURCE_NAME
+              value: "myuser:mypass@tcp(mysql-service-internal:3306)/mydb"
+          ports:
+            - containerPort: 9104
+              name: metrics
