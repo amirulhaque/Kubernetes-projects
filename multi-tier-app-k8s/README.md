@@ -28,13 +28,13 @@ This project demonstrates deploying a **multi-tier application** (React Frontend
 
 ## ⚙️ 2. Setup Kubernetes (EC2 #2)
 
-Install K3s:
+**Install K3s:**
 ```bash
  curl -sfL https://get.k3s.io | sh -
 ```
 
 
-Verify:
+**Verify:**
 ```bash
  sudo kubectl get nodes
 ```
@@ -44,7 +44,7 @@ Verify:
 
 ## ⚙️ 3. Setup Jenkins (EC2 #1)
 
-Install Java & Jenkins
+**Install Java & Jenkins**
 ```bash
 sudo apt update
 sudo apt install openjdk-17-jdk -y # Java required
@@ -71,7 +71,7 @@ sudo systemctl start jenkins
 
 
 
-Install plugins:
+**Install plugins:**
 
 Git
 
@@ -89,10 +89,11 @@ Kubernetes CLI
 ```bash
 sudo apt install docker.io -y
 sudo usermod -aG docker jenkins
-sudo systemctl restart jenkins
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
 ```
 
-Login to Docker Hub as Jenkins user:
+**Login to Docker Hub as Jenkins user:**
 
 sudo su - jenkins
 docker login
@@ -109,7 +110,7 @@ sudo cat /etc/rancher/k3s/k3s.yaml
 
 - Replace 127.0.0.1 with K3s Node Private IP
 
-  **On Jenkins Server -** Copy content to Jenkins server:
+**On Jenkins Server -** Copy content to Jenkins server:
 
 ```bash
 mkdir -p /var/lib/jenkins/.kube
@@ -117,43 +118,18 @@ nano /var/lib/jenkins/.kube/config # paste content
 chown -R jenkins:jenkins /var/lib/jenkins/.kube
 ```
 
-Verify inside Jenkins user:
-
+**Verify inside Jenkins user:**
+```bash
 sudo su - jenkins
 kubectl get nodes
+```
 
 ✅ Jenkins can now access Kubernetes cluster.
 
 
 ---
 
-## ⚙️ 6. Setup Database (MySQL in Kubernetes)
-
-When MySQL Pod starts, login and create DB + users:
-
-kubectl -n three-tier-app exec -it <mysql-pod> -- mysql -u root -p
-
-Inside MySQL shell:
-
-CREATE DATABASE car_db;
-USE car_db;
-
-CREATE TABLE users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100),
-  email VARCHAR(100)
-);
-
-INSERT INTO users (name, email) VALUES
-('Aamir', 'aamir@example.com'),
-('Haque', 'haque@example.com'),
-('Alice', 'alice@example.com'),
-('Bob', 'bob@example.com');
-
-✅ Now backend API will fetch users from MySQL.
-
-
-## ⚙️ 4. Code Updates (Before Build)
+## ⚙️ 6. Code Updates (Before Build)
 
 - **Backend (backend/index.js) →** Update MySQL connection host with K3s Node Private IP.
 
@@ -164,8 +140,7 @@ INSERT INTO users (name, email) VALUES
 
 
 ---
-
-## ⚙️ 5. Jenkins Pipeline Setup
+## ⚙️ 7. Jenkins Pipeline Setup
 
  a. In Jenkins Dashboard → New Item → Pipeline.
 
@@ -183,26 +158,32 @@ INSERT INTO users (name, email) VALUES
 
  ---
 
- ## ⚙️ 6. MySQL Database Setup
+## ⚙️ 8. Setup Database (MySQL in Kubernetes)
 
-**a. Connect to MySQL pod**
-  ```yaml
-   kubectl exec -it <mysql-pod> -n three-tier-app -- mysql -u root -p
-  ```
-   password is **rootpass**
+**When MySQL Pod starts, login and create DB + users:**
+```bash
+kubectl -n three-tier-app exec -it <mysql-pod> -- mysql -u root -p
+```
 
-**b. Create DB & User**
-  ```yaml
-   CREATE DATABASE car_db;
-   CREATE USER 'car_user'@'%' IDENTIFIED BY 'car_pass';
-   GRANT ALL PRIVILEGES ON car_db.* TO 'car_user'@'%';
-   FLUSH PRIVILEGES;
-  ```
+**Inside MySQL shell:**
+```yaml
+CREATE DATABASE car_db;
+USE car_db;
 
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  email VARCHAR(100)
+);
 
+INSERT INTO users (name, email) VALUES
+('Aamir', 'aamir@example.com'),
+('Haque', 'haque@example.com'),
+('Alice', 'alice@example.com'),
+('Bob', 'bob@example.com');
+```
 
----
-
+✅ Now backend API will fetch users from MySQL.
 
 
 ### Pipeline Stages
@@ -219,7 +200,7 @@ INSERT INTO users (name, email) VALUES
 
 ---
 
-## 📊 7. Monitoring & Visualization
+## 📊 9. Monitoring & Visualization
 
 The monitoring stack is under monitoring/.
 
@@ -243,7 +224,7 @@ Workload Performance
 
 ---
 
-## 🌍 8. Access the Application
+## 🌍 10. Access the Application
 
 **Frontend:**
 ```bash
@@ -261,7 +242,7 @@ If the database is configured correctly, the frontend will display user details 
 
 ---
 
-## ✅ 9. Summary
+## ✅ 11. Summary
 
 - Jenkins automates CI/CD pipeline.
 
