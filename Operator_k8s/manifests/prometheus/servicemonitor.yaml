@@ -1,8 +1,15 @@
-apiVersion: mysql.presslabs.org/v1alpha1
-kind: MysqlCluster
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
 metadata:
-  name: demo-mysql
-  namespace: mysql
+  name: demo-app-monitor
+  namespace: monitoring
 spec:
-  replicas: 1
-  secretName: demo-mysql-secret
+  selector:
+    matchLabels:
+      app: demo-app
+  namespaceSelector:
+    matchNames:
+      - default
+  endpoints:
+    - port: 80
+      interval: 15s
