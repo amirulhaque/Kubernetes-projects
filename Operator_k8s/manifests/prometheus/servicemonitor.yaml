@@ -1,0 +1,8 @@
+apiVersion: mysql.presslabs.org/v1alpha1
+kind: MysqlCluster
+metadata:
+  name: demo-mysql
+  namespace: mysql
+spec:
+  replicas: 1
+  secretName: demo-mysql-secret
