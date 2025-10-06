@@ -215,32 +215,29 @@ kubectl apply -f manifests/prometheus/servicemonitor.yaml
 ✅ Prometheus will now automatically detect and scrape metrics.
 
 
-🌐 Step 8: Access Application UIs
+## 🌐 Step 8: Access Application UIs
 
-Application URL Notes
+**Application URL Notes**
 
-📊 Prometheus http://<EC2-IP>:30090 Monitoring UI
-🔔 Alertmanager http://<EC2-IP>:30903 Alert management
-📈 Grafana http://<EC2-IP>:3000 Included in kube-prometheus-stack
-🗄️ MySQL mysql -h <EC2-IP> -P 3306 -u root -p Use password from secret
+**📊 Prometheus** http://<EC2-IP>:30090 Monitoring UI
+**🔔 Alertmanager** http://<EC2-IP>:30903 Alert management
+**📈 Grafana** http://<EC2-IP>:3000 Included in kube-prometheus-stack
+**🗄️ MySQL** mysql -h <EC2-IP> -P 3306 -u root -p Use password from secret
 
 
+## 🧹 Step 9: Cleanup
 
----
-
-🧹 Step 9: Cleanup
-
+```bash
 helm uninstall kube-prometheus -n monitoring
 helm uninstall mysql-operator -n mysql
 
 kubectl delete namespace monitoring
 kubectl delete namespace mysql
 kubectl delete deployment demo-app
+```
 
 
----
-
-📚 Summary
+## 📚 Summary
 
 ✅ Operators simplify lifecycle management of complex applications.
 ⚙️ Prometheus Operator automates monitoring setup.
@@ -252,4 +249,4 @@ kubectl delete deployment demo-app
 
 
 
----
+
