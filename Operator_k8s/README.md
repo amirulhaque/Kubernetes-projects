@@ -119,18 +119,20 @@ kubectl create namespace mysql
 helm install mysql-operator presslabs/mysql-operator -n mysql
 ```
 
-✅ Verify:
+**✅ Verify:**
 
+```bash
 kubectl get pods -n mysql
 kubectl get crds | grep mysql
+```
 
 
----
 
-🧩 Step 5: Deploy Prometheus Custom Resource
+## 🧩 Step 5: Deploy Prometheus Custom Resource
 
-Create manifests/prometheus/prometheus-cr.yaml:
+**Create manifests/prometheus/prometheus-cr.yaml:**
 
+```bash
 apiVersion: monitoring.coreos.com/v1
 kind: Prometheus
 metadata:
@@ -143,13 +145,14 @@ spec:
   resources:
     requests:
       memory: 400Mi
+```
 
-Apply:
+**Apply:**
 
+```bash
 kubectl apply -f manifests/prometheus/prometheus-cr.yaml
+```
 
-
----
 
 🧩 Step 6: Deploy MySQL Custom Resource
 
