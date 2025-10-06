@@ -154,10 +154,11 @@ kubectl apply -f manifests/prometheus/prometheus-cr.yaml
 ```
 
 
-🧩 Step 6: Deploy MySQL Custom Resource
+## 🧩 Step 6: Deploy MySQL Custom Resource
 
-Create manifests/mysql/mysql-cr.yaml:
+**Create manifests/mysql/mysql-cr.yaml:**
 
+```bash
 apiVersion: mysql.presslabs.org/v1alpha1
 kind: MysqlCluster
 metadata:
@@ -166,15 +167,17 @@ metadata:
 spec:
   replicas: 1
   secretName: demo-mysql-secret
+```
 
-Create the MySQL root password secret:
+**Create the MySQL root password secret:**
 
+```bash
 kubectl create secret generic demo-mysql-secret --from-literal=root=password123 -n mysql
 kubectl apply -f manifests/mysql/mysql-cr.yaml
+```
 
 ✅ The operator will automatically create MySQL pods and services.
 
----
 
 🧩 Step 7: Deploy a Demo Application (for Monitoring)
 
