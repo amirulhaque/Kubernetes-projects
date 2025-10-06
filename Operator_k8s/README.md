@@ -1,75 +1,62 @@
 
----
-
 # 🚀 Kubernetes Operator Project
 
-## 📖 Project Overview
-
-This project demonstrates how to use Kubernetes Operators to deploy and manage applications like:
-
-### 🧠 Prometheus — Monitoring and alerting
-
-### 💾 MySQL — Database management
-
-
+### Project Overview
+This project demonstrates how to use Kubernetes Operators to deploy and manage applications like **Prometheus** (Monitoring and alerting) and **MySQL** (Database management).
 We use Helm to simplify operator deployment and manage CRDs (Custom Resource Definitions).
 
-### 🎯 Goals
+### Goals
 
-✅ Automate deployment and scaling
+  i. Automate deployment and scaling
 
-✅ Manage configurations automatically
+  ii. Manage configurations automatically
 
-✅ Handle database backups seamlessly
+  iii. Handle database backups seamlessly
 
-✅ Enable continuous monitoring with Prometheus
+  iv. Enable continuous monitoring with Prometheus
 
 
----
-
-## 🧠 What is a Kubernetes Operator?
+### What is a Kubernetes Operator?
 
 A Kubernetes Operator is an application-specific controller that extends Kubernetes capabilities by automating the deployment, management, and operations of complex applications.
 
-### 📌 Key Concepts
+ **📌 Key Concepts**
 
-🧩 Operators use Custom Resources (CRs) to define the desired state.
+-  Operators use Custom Resources (CRs) to define the desired state.
 
-🔄 The Operator Controller continuously reconciles the actual state with the desired state.
+-  The Operator Controller continuously reconciles the actual state with the desired state.
 
-🤖 Automates tasks like scaling, backups, upgrades, failover, and more.
-
-
-### 🌟 Benefits
-
-📉 Reduces manual intervention
-
-✅ Ensures consistent and reliable deployments
-
-⚙️ Automates complex app lifecycle operations
-
-🔗 Integrates seamlessly with Kubernetes native APIs
+-  Automates tasks like scaling, backups, upgrades, failover, and more.
 
 
+ **🌟 Benefits**
 
----
+-  Reduces manual intervention
 
-## 🛠️ Prerequisites
+-  Ensures consistent and reliable deployments
 
-Requirement Description
+-  Automates complex app lifecycle operations
 
-☁️ AWS EC2 Ubuntu 22.04 LTS, 2 vCPU, 4 GB RAM, 20 GB disk
-🔐 Security Group Open ports: 22 (SSH), 30000–32767 (NodePort), 3306 (MySQL), 9090 (Prometheus), 9093 (Alertmanager), 3000 (Grafana)
-🐳 Docker Installed and running
-☸️ Kubernetes Cluster running (Minikube or kubeadm)
-🧰 Tools kubectl, Helm (v3+) installed
+-  Integrates seamlessly with Kubernetes native APIs
+
+
+
+  **Prerequisites:**
+  
+  Requirement Description
+
+  1.  AWS EC2 Ubuntu 22.04 LTS, 2 vCPU, 4 GB RAM, 20 GB disk
+  2.  Security Group Open ports: 22 (SSH), 30000–32767 (NodePort), 3306 (MySQL), 9090 (Prometheus), 9093 (Alertmanager), 3000 (Grafana)
+  3.  Docker Installed and running
+  4.  Kubernetes Cluster running (Minikube or kubeadm)
+  5.  Tools kubectl, Helm (v3+) installed
 
 
 
 ---
 
-###🧩 Step 1: Setup Kubernetes Cluster
-
+## 🧩 Step 1: Setup Kubernetes Cluster
+```bash
 # Update system
 sudo apt update && sudo apt upgrade -y
 
@@ -86,20 +73,19 @@ minikube start --driver=docker
 
 # Verify cluster
 kubectl get nodes
+```
 
 
----
+## 🧩 Step 2: Install Helm
 
-🧩 Step 2: Install Helm
-
+```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 helm version
+```
 
+## 🧩 Step 3: Deploy Prometheus Operator
 
----
-
-🧩 Step 3: Deploy Prometheus Operator
-
+```bash
 # Add Helm repo
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
@@ -109,17 +95,19 @@ kubectl create namespace monitoring
 
 # Install Prometheus Operator
 helm install kube-prometheus prometheus-community/kube-prometheus-stack -n monitoring
+```
 
-✅ Verify:
+**✅ Verify:**
 
+```bash
 kubectl get pods -n monitoring
 kubectl get crds | grep prometheus
+```
 
 
----
+## 🧩 Step 4: Deploy MySQL Operator
 
-🧩 Step 4: Deploy MySQL Operator
-
+```bash
 # Add Helm repo for MySQL operator
 helm repo add presslabs https://presslabs.github.io/charts
 helm repo update
@@ -129,6 +117,7 @@ kubectl create namespace mysql
 
 # Install MySQL Operator
 helm install mysql-operator presslabs/mysql-operator -n mysql
+```
 
 ✅ Verify:
 
