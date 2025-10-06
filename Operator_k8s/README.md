@@ -220,8 +220,11 @@ kubectl apply -f manifests/prometheus/servicemonitor.yaml
 **Application URL Notes**
 
 **📊 Prometheus** http://<EC2-IP>:30090 Monitoring UI
+
 **🔔 Alertmanager** http://<EC2-IP>:30903 Alert management
+
 **📈 Grafana** http://<EC2-IP>:3000 Included in kube-prometheus-stack
+
 **🗄️ MySQL** mysql -h <EC2-IP> -P 3306 -u root -p Use password from secret
 
 
@@ -239,10 +242,13 @@ kubectl delete deployment demo-app
 
 ## 📚 Summary
 
-✅ Operators simplify lifecycle management of complex applications.
-⚙️ Prometheus Operator automates monitoring setup.
-💾 MySQL Operator handles database creation and management.
-📈 Combined, they provide a powerful, automated, and scalable application stack on Kubernetes.
+- Operators simplify lifecycle management of complex applications.
+
+-  Prometheus Operator automates monitoring setup.
+
+-  MySQL Operator handles database creation and management.
+
+-  Combined, they provide a powerful, automated, and scalable application stack on Kubernetes.
 
 
 ---
