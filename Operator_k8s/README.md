@@ -1,34 +1,37 @@
 
 ---
 
-🚀 Kubernetes Operator Project
+# 🚀 Kubernetes Operator Project
 
-📖 Project Overview
+## 📖 Project Overview
 
 This project demonstrates how to use Kubernetes Operators to deploy and manage applications like:
 
-🧠 Prometheus — Monitoring and alerting
+### 🧠 Prometheus — Monitoring and alerting
 
-💾 MySQL — Database management
+### 💾 MySQL — Database management
 
 
 We use Helm to simplify operator deployment and manage CRDs (Custom Resource Definitions).
 
-🎯 Goals
+### 🎯 Goals
 
 ✅ Automate deployment and scaling
+
 ✅ Manage configurations automatically
+
 ✅ Handle database backups seamlessly
+
 ✅ Enable continuous monitoring with Prometheus
 
 
 ---
 
-🧠 What is a Kubernetes Operator?
+## 🧠 What is a Kubernetes Operator?
 
 A Kubernetes Operator is an application-specific controller that extends Kubernetes capabilities by automating the deployment, management, and operations of complex applications.
 
-📌 Key Concepts
+### 📌 Key Concepts
 
 🧩 Operators use Custom Resources (CRs) to define the desired state.
 
@@ -37,7 +40,7 @@ A Kubernetes Operator is an application-specific controller that extends Kuberne
 🤖 Automates tasks like scaling, backups, upgrades, failover, and more.
 
 
-🌟 Benefits
+### 🌟 Benefits
 
 📉 Reduces manual intervention
 
@@ -51,7 +54,7 @@ A Kubernetes Operator is an application-specific controller that extends Kuberne
 
 ---
 
-🛠️ Prerequisites
+## 🛠️ Prerequisites
 
 Requirement Description
 
@@ -65,7 +68,7 @@ Requirement Description
 
 ---
 
-🧩 Step 1: Setup Kubernetes Cluster
+###🧩 Step 1: Setup Kubernetes Cluster
 
 # Update system
 sudo apt update && sudo apt upgrade -y
