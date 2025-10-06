@@ -179,13 +179,16 @@ kubectl apply -f manifests/mysql/mysql-cr.yaml
 ✅ The operator will automatically create MySQL pods and services.
 
 
-🧩 Step 7: Deploy a Demo Application (for Monitoring)
+## 🧩 Step 7: Deploy a Demo Application (for Monitoring)
 
+```bash
 kubectl create deployment demo-app --image=nginx --port=80
 kubectl expose deployment demo-app --port=80
+```
 
-Create a ServiceMonitor for Prometheus — manifests/prometheus/servicemonitor.yaml:
+**Create a ServiceMonitor for Prometheus —** manifests/prometheus/servicemonitor.yaml:
 
+```bash
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -201,15 +204,16 @@ spec:
   endpoints:
     - port: 80
       interval: 15s
+```
 
-Apply:
+**Apply:**
 
+```bash
 kubectl apply -f manifests/prometheus/servicemonitor.yaml
+```
 
 ✅ Prometheus will now automatically detect and scrape metrics.
 
-
----
 
 🌐 Step 8: Access Application UIs
 
