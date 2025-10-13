@@ -20,6 +20,6 @@ metadata:
   name: api-gateway
   namespace: microshop
 spec:
-  type: ClusterIP
+  type: NodePort
   selector: { app: api-gateway }
   ports: [{ port: 8080, targetPort: 8080 }]
