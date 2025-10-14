@@ -1,38 +1,123 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
-  <title>MicroShop Demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="styles.css">
+  <title>MicroShop Demo 🛍️</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #0078d7;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      color: white;
+    }
+    #btn-products { background: #0078d7; }
+    #btn-users { background: #28a745; }
+    #btn-checkout { background: #ffc107; color: #222; }
+    #out {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 15px;
+      width: 200px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-5px); }
+    img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .price {
+      font-weight: bold;
+      color: #0078d7;
+    }
+  </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>🛍️ MicroShop Demo</h1>
-
-    <div class="button-group">
-      <button class="btn btn-primary" onclick="get('/products')">List Products</button>
-      <button class="btn btn-success" onclick="get('/users')">List Users</button>
-      <button class="btn btn-warning" onclick="postCheckout()">Checkout (demo)</button>
-    </div>
-
-    <pre id="out" class="output-box"></pre>
+  <h1>🛍️ MicroShop Demo</h1>
+  <div>
+    <button id="btn-products" onclick="loadProducts()">List Products</button>
+    <button id="btn-users" onclick="loadUsers()">List Users</button>
+    <button id="btn-checkout" onclick="checkout()">Checkout (demo)</button>
   </div>
+  <div id="out"></div>
 
   <script>
-    async function get(path) {
-      const r = await fetch('/api' + path);
-      document.getElementById('out').textContent = await r.text();
+    const API_BASE = 'https://YOUR-API-HOSTNAME-AND-PORT/api'; 
+    // Example for Killercoda:
+    // const API_BASE = 'https://388982866b69-10-244-11-185-31725.sp-rch.killercoda.com/api';
+
+    const productImages = {
+      p101: 'https://cdn-icons-png.flaticon.com/512/2920/2920339.png', // Laptop
+      p102: 'https://cdn-icons-png.flaticon.com/512/2920/2920340.png', // Phone
+      p103: 'https://cdn-icons-png.flaticon.com/512/2920/2920344.png'  // Mug
+    };
+
+    async function loadProducts() {
+      const res = await fetch(`${API_BASE}/products`);
+      const data = await res.json();
+      const container = document.getElementById('out');
+      container.innerHTML = '';
+      data.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${productImages[p.id] || 'https://cdn-icons-png.flaticon.com/512/679/679922.png'}">
+          <h3>${p.name}</h3>
+          <p class="price">₹ ${(p.price/100).toFixed(2)}</p>
+        `;
+        container.appendChild(card);
+      });
     }
 
-    async function postCheckout() {
-      const r = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 'u1' })
+    async function loadUsers() {
+      const res = await fetch(`${API_BASE}/users`);
+      const data = await res.json();
+      const container = document.getElementById('out');
+      container.innerHTML = '';
+      data.forEach(u => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
+          <h3>${u.name}</h3>
+          <p>${u.email}</p>
+        `;
+        container.appendChild(card);
       });
-      document.getElementById('out').textContent = await r.text();
+    }
+
+    async function checkout() {
+      const res = await fetch(`${API_BASE}/checkout`, { 
+        method: 'POST', 
+        headers: {'Content-Type': 'application/json'}, 
+        body: JSON.stringify({userId: 'u1'})
+      });
+      const data = await res.json();
+      const container = document.getElementById('out');
+      container.innerHTML = `<div class="card"><h3>✅ Order Placed!</h3><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
     }
   </script>
 </body>
