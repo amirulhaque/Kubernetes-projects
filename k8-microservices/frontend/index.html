@@ -3,33 +3,21 @@
 <head>
   <meta charset="utf-8">
   <title>MicroShop Demo 🛍️</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-    h1 {
-      color: #0078d7;
-      margin-bottom: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      color: white;
-      transition: 0.2s;
-    }
-    #btn-products { background: #0078d7; }
-    #btn-users { background: #28a745; }
-    #btn-checkout { background: #ffc107; color: #222; }
-    button:hover { opacity: 0.85; }
-    // ✅ No hardcoded Killercoda URL needed
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>🛒 MicroShop Demo</h1>
+
+  <div class="button-group">
+    <button class="btn-primary" onclick="loadProducts()">List Products</button>
+    <button class="btn-success" onclick="loadUsers()">List Users</button>
+    <button class="btn-warning" onclick="checkout()">Checkout (demo)</button>
+  </div>
+
+  <div id="out" class="output-box"></div>
+
+  <script>
+    // No hardcoded Killercoda URL needed
     const API_BASE = '/api';
 
     // Example product images
