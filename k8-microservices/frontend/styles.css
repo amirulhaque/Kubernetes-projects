@@ -67,3 +67,32 @@ button {
   word-wrap: break-word;
   font-size: 15px;
 }
+
+/* Product & user cards */
+.card {
+  display: inline-block;
+  background: #ffffff;
+  padding: 15px;
+  margin: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 180px;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.03);
+}
+
+.card img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.price {
+  font-weight: bold;
+  color: #28a745;
+}
