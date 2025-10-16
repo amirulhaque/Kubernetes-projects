@@ -22,9 +22,9 @@
 
     // Example product images
     const productImages = {
-      p101: 'https://cdn-icons-png.flaticon.com/512/2920/2920339.png', // Laptop
-      p102: 'https://cdn-icons-png.flaticon.com/512/2920/2920340.png', // Phone
-      p103: 'https://cdn-icons-png.flaticon.com/512/2920/2920344.png' // Mug
+      p101: 'images/laptop.jpg', // Laptop
+      p102: 'images/mobile.jpg', // Phone
+      p103: 'images/mug.jpg' // Mug
     };
 
     async function loadProducts() {
@@ -38,7 +38,7 @@
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="${productImages[p.id] || 'https://cdn-icons-png.flaticon.com/512/679/679922.png'}">
+            <img src="${productImages[p.id] || 'images/default.png'}" alt="{p.name}">
             <h3>${p.name}</h3>
             <p class="price">₹ ${(p.price/100).toFixed(2)}</p>
           `;
@@ -60,7 +60,7 @@
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
+            <img src="images/user.jpg" alt="User">
             <h3>${u.name}</h3>
             <p>${u.email}</p>
           `;
