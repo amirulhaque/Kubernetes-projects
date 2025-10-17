@@ -1,94 +1,108 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>MicroShop Demo 🛍️</title>
+  <title>MicroShop 🛍️</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>🛒 MicroShop Demo</h1>
+  <header>
+    <h1>🛒 MicroShop</h1>
+    <nav>
+      <button class="btn-primary" onclick="loadProducts()">Products</button>
+      <button class="btn-success" onclick="loadUsers()">Users</button>
+      <button class="btn-warning" onclick="viewCart()">🛍️ View Cart (<span id="cart-count">0</span>)</button>
+    </nav>
+  </header>
 
-  <div class="button-group">
-    <button class="btn-primary" onclick="loadProducts()">List Products</button>
-    <button class="btn-success" onclick="loadUsers()">List Users</button>
-    <button class="btn-warning" onclick="checkout()">Checkout (demo)</button>
-  </div>
+  <main>
+    <div id="out" class="grid-container"></div>
+  </main>
 
-  <div id="out" class="output-box"></div>
+  <footer>© 2025 MicroShop Demo | Built with ❤️</footer>
 
   <script>
-    // No hardcoded Killercoda URL needed
     const API_BASE = '/api';
-
-    // Example product images
     const productImages = {
-      p101: 'images/laptop.jpg', // Laptop
-      p102: 'images/mobile.jpg', // Phone
-      p103: 'images/mug.jpg' // Mug
+      p101: 'images/laptop.jpg',
+      p102: 'images/mobile.jpg',
+      p103: 'images/mug.jpg'
     };
 
+    let cart = [];
+
     async function loadProducts() {
-      try {
-        const res = await fetch(`${API_BASE}/products`);
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        const container = document.getElementById('out');
-        container.innerHTML = '';
-        data.forEach(p => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src="${productImages[p.id] || 'images/default.png'}" alt="{p.name}">
-            <h3>${p.name}</h3>
-            <p class="price">₹ ${(p.price/100).toFixed(2)}</p>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        document.getElementById('out').innerHTML = `<p style="color:red">⚠️ ${err.message}</p>`;
-      }
+      const res = await fetch(`${API_BASE}/products`);
+      const data = await res.json();
+      const container = document.getElementById('out');
+      container.innerHTML = '';
+      data.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${productImages[p.id] || 'images/default.png'}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p class="price">₹ ${(p.price/100).toFixed(2)}</p>
+          <button class="btn-add" onclick="addToCart('${p.id}', '${p.name}', ${p.price})">Add to Cart</button>
+        `;
+        container.appendChild(card);
+      });
     }
 
     async function loadUsers() {
-      try {
-        const res = await fetch(`${API_BASE}/users`);
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        const container = document.getElementById('out');
-        container.innerHTML = '';
-        data.forEach(u => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src="images/user.jpg" alt="User">
-            <h3>${u.name}</h3>
-            <p>${u.email}</p>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        document.getElementById('out').innerHTML = `<p style="color:red">⚠️ ${err.message}</p>`;
+      const res = await fetch(`${API_BASE}/users`);
+      const data = await res.json();
+      const container = document.getElementById('out');
+      container.innerHTML = '';
+      data.forEach(u => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="images/user.jpg" alt="User">
+          <h3>${u.name}</h3>
+          <p>${u.email}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function addToCart(id, name, price) {
+      cart.push({ id, name, price });
+      document.getElementById('cart-count').textContent = cart.length;
+    }
+
+    function viewCart() {
+      const container = document.getElementById('out');
+      if (cart.length === 0) {
+        container.innerHTML = `<p class="empty-cart">🛒 Your cart is empty.</p>`;
+        return;
       }
+      const total = cart.reduce((sum, i) => sum + i.price, 0);
+      container.innerHTML = `
+        <h2>Your Cart</h2>
+        <ul class="cart-list">
+          ${cart.map(item => `<li>${item.name} - ₹ ${(item.price/100).toFixed(2)}</li>`).join('')}
+        </ul>
+        <h3>Total: ₹ ${(total/100).toFixed(2)}</h3>
+        <button class="btn-checkout" onclick="checkout()">Checkout</button>
+      `;
     }
 
     async function checkout() {
-      try {
-        const res = await fetch(`${API_BASE}/checkout`, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({userId: 'u1'})
-        });
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        document.getElementById('out').innerHTML = `
-          <div class="card">
-            <h3>✅ Order Placed!</h3>
-            <pre>${JSON.stringify(data, null, 2)}</pre>
-          </div>
-        `;
-      } catch (err) {
-        document.getElementById('out').innerHTML = `<p style="color:red">⚠️ ${err.message}</p>`;
-      }
+      const res = await fetch(`${API_BASE}/checkout`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ userId: 'u1', items: cart })
+      });
+      const data = await res.json();
+      document.getElementById('out').innerHTML = `
+        <div class="card success">
+          <h3>✅ Order Placed Successfully!</h3>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        </div>
+      `;
+      cart = [];
+      document.getElementById('cart-count').textContent = 0;
     }
   </script>
 </body>
