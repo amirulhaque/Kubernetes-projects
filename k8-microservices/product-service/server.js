@@ -6,6 +6,9 @@ const PORT = 8080;
 const products = [
   { id: 'p101', name: 'Laptop', price: 99900 },
   { id: 'p102', name: 'Phone', price: 59900 },
+  { id: 'p103', name: 'Headphones', price: 2500 },
+  { id: 'p103', name: 'Smart Watch', price: 9000 },
+  { id: 'p102', name: 'Gaming Mouse', price: 1500 },
   { id: 'p103', name: 'Mug', price: 999 }
 ];
 
