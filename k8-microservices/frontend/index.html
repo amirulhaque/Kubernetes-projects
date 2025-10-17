@@ -79,6 +79,25 @@
       updateCartCount();
     }
 
+    function removeFromCart(id) {
+      if (cart[id]) {
+        delete cart[id];
+        updateCartCount();
+        viewCart();
+      }
+    }
+
+    function changeQuantity(id, delta) {
+      if (cart[id]) {
+        cart[id].quantity += delta;
+        if (cart[id].quantity <= 0) {
+          delete cart[id];
+        }
+        updateCartCount();
+        viewCart();
+      }
+    }
+
     function updateCartCount() {
       const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
       document.getElementById('cart-count').textContent = count;
@@ -97,16 +116,20 @@
       container.innerHTML = `
         <h2>Your Cart</h2>
         <ul class="cart-list">
-          ${items
-            .map(
-              item => `
-              <li>
-                ${item.name} × ${item.quantity}
-                <span class="cart-price">₹ ${((item.price * item.quantity) / 100).toFixed(2)}</span>
-              </li>
-            `
-            )
-            .join('')}
+          ${items.map(item => `
+            <li>
+              <div class="cart-item">
+                <span class="cart-name">${item.name}</span>
+                <div class="cart-controls">
+                  <button class="qty-btn" onclick="changeQuantity('${item.id}', -1)">−</button>
+                  <span class="qty">${item.quantity}</span>
+                  <button class="qty-btn" onclick="changeQuantity('${item.id}', 1)">+</button>
+                  <span class="cart-price">₹ ${((item.price * item.quantity) / 100).toFixed(2)}</span>
+                  <button class="remove-btn" onclick="removeFromCart('${item.id}')">🗑️</button>
+                </div>
+              </div>
+            </li>
+          `).join('')}
         </ul>
         <h3>Total: ₹ ${(total / 100).toFixed(2)}</h3>
         <button class="btn-checkout" onclick="checkout()">Checkout</button>
