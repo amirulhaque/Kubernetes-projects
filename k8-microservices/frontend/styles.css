@@ -36,7 +36,7 @@ nav button {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
   padding: 30px;
-  max-width: 1000px;
+  max-width: 1100px;
   margin: auto;
 }
 
@@ -48,6 +48,7 @@ nav button {
   text-align: center;
   transition: transform 0.2s ease;
 }
+
 .card:hover { transform: scale(1.03); }
 
 .card img {
@@ -57,7 +58,11 @@ nav button {
   margin-bottom: 10px;
 }
 
-.price { color: #28a745; font-weight: bold; }
+.price {
+  color: #28a745;
+  font-weight: bold;
+  margin: 5px 0;
+}
 
 footer {
   text-align: center;
@@ -80,6 +85,19 @@ footer {
 }
 
 .cart-list li {
-  padding: 6px 0;
+  padding: 8px 0;
   border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+}
+
+.cart-price {
+  font-weight: 600;
+  color: #198754;
+}
+
+.card.success {
+  background: #e9fbe9;
+  border: 2px solid #198754;
 }
