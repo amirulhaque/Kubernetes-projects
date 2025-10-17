@@ -32,20 +32,21 @@
       p106: 'images/mug.jpg'
     };
 
-    let cart = [];
+    let cart = {};
 
     async function loadProducts() {
       const res = await fetch(`${API_BASE}/products`);
       const data = await res.json();
       const container = document.getElementById('out');
       container.innerHTML = '';
+
       data.forEach(p => {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
           <img src="${productImages[p.id] || 'images/default.png'}" alt="${p.name}">
           <h3>${p.name}</h3>
-          <p class="price">₹ ${(p.price/100).toFixed(2)}</p>
+          <p class="price">₹ ${(p.price / 100).toFixed(2)}</p>
           <button class="btn-add" onclick="addToCart('${p.id}', '${p.name}', ${p.price})">Add to Cart</button>
         `;
         container.appendChild(card);
@@ -70,33 +71,56 @@
     }
 
     function addToCart(id, name, price) {
-      cart.push({ id, name, price });
-      document.getElementById('cart-count').textContent = cart.length;
+      if (cart[id]) {
+        cart[id].quantity += 1;
+      } else {
+        cart[id] = { id, name, price, quantity: 1 };
+      }
+      updateCartCount();
+    }
+
+    function updateCartCount() {
+      const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
     }
 
     function viewCart() {
       const container = document.getElementById('out');
-      if (cart.length === 0) {
+      const items = Object.values(cart);
+
+      if (items.length === 0) {
         container.innerHTML = `<p class="empty-cart">🛒 Your cart is empty.</p>`;
         return;
       }
-      const total = cart.reduce((sum, i) => sum + i.price, 0);
+
+      const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
       container.innerHTML = `
         <h2>Your Cart</h2>
         <ul class="cart-list">
-          ${cart.map(item => `<li>${item.name} - ₹ ${(item.price/100).toFixed(2)}</li>`).join('')}
+          ${items
+            .map(
+              item => `
+              <li>
+                ${item.name} × ${item.quantity}
+                <span class="cart-price">₹ ${((item.price * item.quantity) / 100).toFixed(2)}</span>
+              </li>
+            `
+            )
+            .join('')}
         </ul>
-        <h3>Total: ₹ ${(total/100).toFixed(2)}</h3>
+        <h3>Total: ₹ ${(total / 100).toFixed(2)}</h3>
         <button class="btn-checkout" onclick="checkout()">Checkout</button>
       `;
     }
 
     async function checkout() {
+      const items = Object.values(cart);
       const res = await fetch(`${API_BASE}/checkout`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ userId: 'u1', items: cart })
+        body: JSON.stringify({ userId: 'u1', items })
       });
+
       const data = await res.json();
       document.getElementById('out').innerHTML = `
         <div class="card success">
@@ -104,8 +128,8 @@
           <pre>${JSON.stringify(data, null, 2)}</pre>
         </div>
       `;
-      cart = [];
-      document.getElementById('cart-count').textContent = 0;
+      cart = {};
+      updateCartCount();
     }
   </script>
 </body>
