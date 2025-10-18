@@ -141,22 +141,59 @@
       `;
     }
 
-    async function checkout() {
-      const res = await fetch(`${API_BASE}/checkout`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ userId: 'u1', items: Object.values(cart) })
-      });
-      const data = await res.json();
-      document.getElementById('out').innerHTML = `
-        <div class="success-box">
-          <h3>✅ Order Placed Successfully!</h3>
-          <pre>${JSON.stringify(data, null, 2)}</pre>
-        </div>
-      `;
-      cart = {};
-      updateCartCount();
-    }
+	async function checkout() {
+	  try {
+		const items = Object.values(cart);
+		if (!items.length) {
+		  alert('🛒 Your cart is empty');
+		  return;
+		}
+
+		// Step 1: Create Order
+		const orderRes = await fetch(`${API_BASE}/orders`, {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({ userId: 'u1', items })
+		});
+		if (!orderRes.ok) throw new Error(`Order creation failed (${orderRes.status})`);
+		const order = await orderRes.json();
+
+		// Step 2: Trigger Payment
+		const paymentRes = await fetch(`${API_BASE}/payments`, {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({ orderId: order.id, amount: order.total })
+		});
+		const payment = await paymentRes.json();
+
+		// Step 3: Notify User
+		const notifyRes = await fetch(`${API_BASE}/notify`, {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({
+			userId: 'u1',
+			message: `Your order ${order.id} of ₹ ${(order.total / 100).toFixed(2)} has been placed successfully!`
+		  })
+		});
+		const notification = await notifyRes.json();
+
+		// Show result
+		document.getElementById('out').innerHTML = `
+		  <div class="success-box">
+			<h3>✅ Order Placed Successfully!</h3>
+			<p><b>Order ID:</b> ${order.id}</p>
+			<p><b>Payment:</b> ${payment.status} (Tx: ${payment.txId})</p>
+			<p><b>Notification:</b> ${notification.status}</p>
+			<h4>Total Paid: ₹ ${(order.total / 100).toFixed(2)}</h4>
+		  </div>
+		`;
+
+		cart = {};
+		updateCartCount();
+	  } catch (err) {
+		document.getElementById('out').innerHTML = `<p class="error">⚠️ ${err.message}</p>`;
+	  }
+	}
   </script>
 </body>
 </html>
