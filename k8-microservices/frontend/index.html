@@ -7,12 +7,14 @@
 </head>
 <body>
   <header>
-    <h1>🛒 MicroShop</h1>
-    <nav>
-      <button class="btn-primary" onclick="loadProducts()">Products</button>
-      <button class="btn-success" onclick="loadUsers()">Users</button>
-      <button class="btn-warning" onclick="viewCart()">🛍️ View Cart (<span id="cart-count">0</span>)</button>
-    </nav>
+    <div class="header-content">
+      <h1>🛒 MicroShop</h1>
+      <nav>
+        <button class="btn-primary" onclick="loadProducts()">Products</button>
+        <button class="btn-success" onclick="loadUsers()">Users</button>
+        <button class="btn-warning" onclick="viewCart()">🛍️ View Cart (<span id="cart-count">0</span>)</button>
+      </nav>
+    </div>
   </header>
 
   <main>
@@ -38,6 +40,7 @@
       const res = await fetch(`${API_BASE}/products`);
       const data = await res.json();
       const container = document.getElementById('out');
+      container.className = 'grid-container';
       container.innerHTML = '';
 
       data.forEach(p => {
@@ -57,6 +60,7 @@
       const res = await fetch(`${API_BASE}/users`);
       const data = await res.json();
       const container = document.getElementById('out');
+      container.className = 'grid-container';
       container.innerHTML = '';
       data.forEach(u => {
         const card = document.createElement('div');
@@ -71,82 +75,81 @@
     }
 
     function addToCart(id, name, price) {
-      if (cart[id]) {
-        cart[id].quantity += 1;
-      } else {
-        cart[id] = { id, name, price, quantity: 1 };
-      }
+      if (cart[id]) cart[id].quantity++;
+      else cart[id] = { id, name, price, quantity: 1 };
       updateCartCount();
     }
 
-    function removeFromCart(id) {
-      if (cart[id]) {
-        delete cart[id];
-        updateCartCount();
-        viewCart();
-      }
+    function changeQuantity(id, delta) {
+      if (!cart[id]) return;
+      cart[id].quantity += delta;
+      if (cart[id].quantity <= 0) delete cart[id];
+      updateCartCount();
+      viewCart();
     }
 
-    function changeQuantity(id, delta) {
-      if (cart[id]) {
-        cart[id].quantity += delta;
-        if (cart[id].quantity <= 0) {
-          delete cart[id];
-        }
-        updateCartCount();
-        viewCart();
-      }
+    function removeFromCart(id) {
+      delete cart[id];
+      updateCartCount();
+      viewCart();
     }
 
     function updateCartCount() {
-      const count = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+      const count = Object.values(cart).reduce((a, b) => a + b.quantity, 0);
       document.getElementById('cart-count').textContent = count;
     }
 
     function viewCart() {
       const container = document.getElementById('out');
+      container.className = 'cart-container';
       const items = Object.values(cart);
 
-      if (items.length === 0) {
-        container.innerHTML = `<p class="empty-cart">🛒 Your cart is empty.</p>`;
+      if (!items.length) {
+        container.innerHTML = `<p class="empty-cart">🛒 Your cart is empty</p>`;
         return;
       }
 
-      const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
       container.innerHTML = `
-        <h2>Your Cart</h2>
-        <ul class="cart-list">
-          ${items.map(item => `
-            <li>
-              <div class="cart-item">
-                <span class="cart-name">${item.name}</span>
-                <div class="cart-controls">
-                  <button class="qty-btn" onclick="changeQuantity('${item.id}', -1)">−</button>
-                  <span class="qty">${item.quantity}</span>
-                  <button class="qty-btn" onclick="changeQuantity('${item.id}', 1)">+</button>
-                  <span class="cart-price">₹ ${((item.price * item.quantity) / 100).toFixed(2)}</span>
-                  <button class="remove-btn" onclick="removeFromCart('${item.id}')">🗑️</button>
-                </div>
-              </div>
-            </li>
-          `).join('')}
-        </ul>
-        <h3>Total: ₹ ${(total / 100).toFixed(2)}</h3>
-        <button class="btn-checkout" onclick="checkout()">Checkout</button>
+        <div class="cart-card">
+          <h2>Your Cart</h2>
+          <table class="cart-table">
+            <thead>
+              <tr><th>Item</th><th>Qty</th><th>Price</th><th></th></tr>
+            </thead>
+            <tbody>
+              ${items.map(i => `
+                <tr>
+                  <td>${i.name}</td>
+                  <td>
+                    <button class="qty-btn" onclick="changeQuantity('${i.id}', -1)">−</button>
+                    <span class="qty">${i.quantity}</span>
+                    <button class="qty-btn" onclick="changeQuantity('${i.id}', 1)">+</button>
+                  </td>
+                  <td>₹ ${(i.price * i.quantity / 100).toFixed(2)}</td>
+                  <td><button class="remove-btn" onclick="removeFromCart('${i.id}')">✖</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="cart-summary">
+            <h3>Total: ₹ ${(total / 100).toFixed(2)}</h3>
+            <button class="btn-checkout" onclick="checkout()">Checkout</button>
+          </div>
+        </div>
       `;
     }
 
     async function checkout() {
-      const items = Object.values(cart);
       const res = await fetch(`${API_BASE}/checkout`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ userId: 'u1', items })
+        body: JSON.stringify({ userId: 'u1', items: Object.values(cart) })
       });
-
       const data = await res.json();
       document.getElementById('out').innerHTML = `
-        <div class="card success">
+        <div class="success-box">
           <h3>✅ Order Placed Successfully!</h3>
           <pre>${JSON.stringify(data, null, 2)}</pre>
         </div>
