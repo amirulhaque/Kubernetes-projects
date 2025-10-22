@@ -13,3 +13,9 @@ A microservices-based web application deployed on Kubernetes, featuring multiple
 4. GitHub repo cloned to your system.  
 
 ---
+
+## 📥 **Clone the Repository**
+```bash
+git clone https://github.com/amirulhaque/Kubernetes-projects.git
+cd k8-microservices
+```
