@@ -10,10 +10,10 @@ const products = [
   { id: 'p104', name: 'Smart Watch', price: 9000 },
   { id: 'p105', name: 'Gaming Mouse', price: 1500 },
   { id: 'p106', name: 'Mug', price: 999 },
-  { id: 'p106', name: 'Mug', price: 999 },
-  { id: 'p106', name: 'Mug', price: 999 },
-  { id: 'p106', name: 'Mug', price: 999 },
-  { id: 'p106', name: 'Mug', price: 999 }
+  { id: 'p107', name: 'Car', price: 4500000 },
+  { id: 'p108', name: 'Bike', price: 150000 },
+  { id: 'p109', name: 'Bag', price: 600 },
+  { id: 'p110', name: 'PC', price: 8000 }
 ];
 
 app.get('/', (r,s) => s.send('🛍 Product Service'));
