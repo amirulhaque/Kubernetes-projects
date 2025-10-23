@@ -9,6 +9,10 @@ const products = [
   { id: 'p103', name: 'Headphones', price: 2500 },
   { id: 'p104', name: 'Smart Watch', price: 9000 },
   { id: 'p105', name: 'Gaming Mouse', price: 1500 },
+  { id: 'p106', name: 'Mug', price: 999 },
+  { id: 'p106', name: 'Mug', price: 999 },
+  { id: 'p106', name: 'Mug', price: 999 },
+  { id: 'p106', name: 'Mug', price: 999 },
   { id: 'p106', name: 'Mug', price: 999 }
 ];
 
