@@ -7,7 +7,7 @@ COPY styles.css /usr/share/nginx/html/styles.css
 COPY images/ /usr/share/nginx/html/images/
 
 # Replace default Nginx site config with your custom one
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/http.d/default.conf
 
 # Expose port 80 for the container
 EXPOSE 80
