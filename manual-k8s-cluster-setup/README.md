@@ -1,5 +1,5 @@
 
-🚀 Kubernetes Manual Cluster Setup & Microservices Deployment (Azure VMs + kubeadm + Ingress + Load Balancer)
+# 🚀 Kubernetes Manual Cluster Setup & Microservices Deployment (Azure VMs + kubeadm + Ingress + Load Balancer)
 
 This repository documents the full end-to-end setup of a production-style Kubernetes Cluster manually installed using kubeadm, deployed on Azure VMs, with:
 
