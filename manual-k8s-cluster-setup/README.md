@@ -1,54 +1,55 @@
 
 # 🚀 Kubernetes Manual Cluster Setup & Microservices Deployment (Azure VMs + kubeadm + Ingress + Load Balancer)
 
-This repository documents the full end-to-end setup of a production-style Kubernetes Cluster manually installed using kubeadm, deployed on Azure VMs, with:
-
-Containerd runtime
-
-Flannel CNI networking
-
-NGINX Ingress Controller
-
-Azure Load Balancer
-
-DNS Mapping
-
-Multi-service Microservices Deployment
-
-End-to-end Testing & Verification
+**This repository contains a complete step-by-step guide for manually setting up a Kubernetes cluster on Azure Virtual Machines, deploying a microservices application, and exposing it using NGINX Ingress Controller with an Azure Load Balancer.**
 
 
 
----
+🧩 Architecture Overview
+````markdown
+                                                            +----------------------+
+                                                            | Public User |
+                                                            +----------+-----------+
+                                                                       |
+                                                                       v
+                                                            +----------------------+
+                                                            | Domain: |
+                                                            | amirulhaq.world |
+                                                            +----------+-----------+
+                                                                       |
+                                                                       v
+                                                          +-------------------------+
+                                                          | Azure Load Balancer |
+                                                          | (Static Public IP) |
+                                                          +-----------+-------------+
+                                                                      |
+                                                                      v
+                                                        +----------------------------+
+                                                        | NGINX Ingress Controller |
+                                                        | (Running in Kubernetes) |
+                                                        +------------+---------------+
+                                                                     |
+                                                                     v
+                                                      +------------------------------------+
+                                                      | Kubernetes Cluster (kubeadm) |
+                                                      |-------------------------------------|
+                                                      | Master Node: k8s-master |
+                                                      | Worker Node: k8s-worker1 |
+                                                      +-----------------+--------------------+
+                                                                        |
+                                               ---------------------------------------------------------
+                                               |                                                       |
+                                               v                                                       v
+                                        +---------------+                                    +-------------------+
+                                        | Frontend App |                                     | Backend Services |
+                                        | (Deployment + |                                    | (API, Auth, etc.) |
+                                        | Service) |                                         | (Pods + Services) |
+                                        +---------------+                                    +-------------------+
 
-📘 Architecture Overview
+````
 
-Cluster Architecture
 
-+-------------------+
-          | Public Internet |
-          +---------+---------+
-                    |
-                    ▼
-          +-------------------+
-          | Azure LoadBalancer|
-          | Public IP: X.X.X.X|
-          +---------+---------+
-                    |
-   ---------------------------------------
-   | |
-   ▼ ▼
-+----------+ +-------------+
-| Master | | Worker Node |
-| 10.0.0.4 | | 10.0.0.5 |
-+----------+ +-------------+
-       | |
-       |------ Flannel Pod Network --------|
-                10.244.0.0/16 [10.244.0.0]
 
-Ingress Flow
-
-User → DNS → Azure LB → NodePort (31177) → Ingress Controller → Services → Pods
 
 
 ---
