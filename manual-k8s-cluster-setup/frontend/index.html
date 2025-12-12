@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MicroShop 🛍️</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>🛒 MicroShop</h1>
+      <nav>
+        <button class="btn-primary" onclick="loadProducts()">Products</button>
+        <button class="btn-success" onclick="loadUsers()">Users</button>
+        <button class="btn-warning" onclick="viewCart()">🛍️ View Cart (<span id="cart-count">0</span>)</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div id="out" class="grid-container"></div>
+  </main>
+
+  <footer>© 2025 MicroShop Demo | Built with ❤️</footer>
+
+  <script>
+    const API_BASE = '/api';
+    const productImages = {
+      p101: 'images/laptop.jpg',
+      p102: 'images/mobile.jpg',
+      p103: 'images/headphones.jpg',
+      p104: 'images/watch.jpg',
+      p105: 'images/mouse.jpg',
+      p106: 'images/mug.jpg',
+	  p107: 'images/mobile.jpg'
+    };
+
+    let cart = {};
+
+    async function loadProducts() {
+      const res = await fetch(`${API_BASE}/products`);
+      const data = await res.json();
+      const container = document.getElementById('out');
+      container.className = 'grid-container';
+      container.innerHTML = '';
+
+      data.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${productImages[p.id] || 'images/default.png'}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p class="price">₹ ${(p.price / 100).toFixed(2)}</p>
+          <button class="btn-add" onclick="addToCart('${p.id}', '${p.name}', ${p.price})">Add to Cart</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function loadUsers() {
+      const res = await fetch(`${API_BASE}/users`);
+      const data = await res.json();
+      const container = document.getElementById('out');
+      container.className = 'grid-container';
+      container.innerHTML = '';
+      data.forEach(u => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="images/user.jpg" alt="User">
+          <h3>${u.name}</h3>
+          <p>${u.email}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function addToCart(id, name, price) {
+      if (cart[id]) cart[id].quantity++;
+      else cart[id] = { id, name, price, quantity: 1 };
+      updateCartCount();
+    }
+
+    function changeQuantity(id, delta) {
+      if (!cart[id]) return;
+      cart[id].quantity += delta;
+      if (cart[id].quantity <= 0) delete cart[id];
+      updateCartCount();
+      viewCart();
+    }
+
+    function removeFromCart(id) {
+      delete cart[id];
+      updateCartCount();
+      viewCart();
+    }
+
+    function updateCartCount() {
+      const count = Object.values(cart).reduce((a, b) => a + b.quantity, 0);
+      document.getElementById('cart-count').textContent = count;
+    }
+
+    function viewCart() {
+      const container = document.getElementById('out');
+      container.className = 'cart-container';
+      const items = Object.values(cart);
+
+      if (!items.length) {
+        container.innerHTML = `<p class="empty-cart">🛒 Your cart is empty</p>`;
+        return;
+      }
+
+      const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+      container.innerHTML = `
+        <div class="cart-card">
+          <h2>Your Cart</h2>
+          <table class="cart-table">
+            <thead>
+              <tr><th>Item</th><th>Qty</th><th>Price</th><th></th></tr>
+            </thead>
+            <tbody>
+              ${items.map(i => `
+                <tr>
+                  <td>${i.name}</td>
+                  <td>
+                    <button class="qty-btn" onclick="changeQuantity('${i.id}', -1)">−</button>
+                    <span class="qty">${i.quantity}</span>
+                    <button class="qty-btn" onclick="changeQuantity('${i.id}', 1)">+</button>
+                  </td>
+                  <td>₹ ${(i.price * i.quantity / 100).toFixed(2)}</td>
+                  <td><button class="remove-btn" onclick="removeFromCart('${i.id}')">✖</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="cart-summary">
+            <h3>Total: ₹ ${(total / 100).toFixed(2)}</h3>
+            <button class="btn-checkout" onclick="checkout()">Checkout</button>
+          </div>
+        </div>
+      `;
+    }
+
+	async function checkout() {
+	  try {
+		const items = Object.values(cart);
+		if (!items.length) {
+		  alert('🛒 Your cart is empty');
+		  return;
+		}
+
+		// Step 1: Create Order
+		const orderRes = await fetch(`${API_BASE}/orders`, {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({ userId: 'u1', items })
+		});
+		if (!orderRes.ok) throw new Error(`Order creation failed (${orderRes.status})`);
+		const order = await orderRes.json();
+
+		// Step 2: Trigger Payment
+		const paymentRes = await fetch(`${API_BASE}/payments`, {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({ orderId: order.id, amount: order.total })
+		});
+		const payment = await paymentRes.json();
+
+		// Step 3: Notify User
+		const notifyRes = await fetch(`${API_BASE}/notify`, {
+		  method: 'POST',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({
+			userId: 'u1',
+			message: `Your order ${order.id} of ₹ ${(order.total / 100).toFixed(2)} has been placed successfully!`
+		  })
+		});
+		const notification = await notifyRes.json();
+
+		// Show result
+		document.getElementById('out').innerHTML = `
+		  <div class="success-box">
+			<h3>✅ Order Placed Successfully!</h3>
+			<p><b>Order ID:</b> ${order.id}</p>
+			<p><b>Payment:</b> ${payment.status} (Tx: ${payment.txId})</p>
+			<p><b>Notification:</b> ${notification.status}</p>
+			<h4>Total Paid: ₹ ${(order.total / 100).toFixed(2)}</h4>
+		  </div>
+		`;
+
+		cart = {};
+		updateCartCount();
+	  } catch (err) {
+		document.getElementById('out').innerHTML = `<p class="error">⚠️ ${err.message}</p>`;
+	  }
+	}
+  </script>
+</body>
+</html>
