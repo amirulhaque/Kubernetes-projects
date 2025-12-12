@@ -5,45 +5,45 @@
 
 
 
-🧩 Architecture Overview
+# 🧩 Architecture Overview
 ````markdown
                                                             +----------------------+
-                                                            | Public User |
+                                                            | Public User          |
                                                             +----------+-----------+
                                                                        |
                                                                        v
                                                             +----------------------+
-                                                            | Domain: |
-                                                            | amirulhaq.world |
+                                                            | Domain:              |
+                                                            | amirulhaq.world      |
                                                             +----------+-----------+
                                                                        |
                                                                        v
                                                           +-------------------------+
-                                                          | Azure Load Balancer |
-                                                          | (Static Public IP) |
+                                                          | Azure Load Balancer     |
+                                                          | (Static Public IP)      |
                                                           +-----------+-------------+
                                                                       |
                                                                       v
                                                         +----------------------------+
-                                                        | NGINX Ingress Controller |
-                                                        | (Running in Kubernetes) |
+                                                        | NGINX Ingress Controller   |
+                                                        | (Running in Kubernetes)    |
                                                         +------------+---------------+
                                                                      |
                                                                      v
-                                                      +------------------------------------+
-                                                      | Kubernetes Cluster (kubeadm) |
-                                                      |-------------------------------------|
-                                                      | Master Node: k8s-master |
-                                                      | Worker Node: k8s-worker1 |
+                                                      +-------------------------------------+
+                                                      | Kubernetes Cluster (kubeadm)        |
+                                                      +-------------------------------------+
+                                                      | Master Node: k8s-master             |
+                                                      | Worker Node: k8s-worker1            |
                                                       +-----------------+--------------------+
                                                                         |
-                                               ---------------------------------------------------------
+                                               +-------------------------------------------------------+
                                                |                                                       |
                                                v                                                       v
                                         +---------------+                                    +-------------------+
-                                        | Frontend App |                                     | Backend Services |
+                                        | Frontend App  |                                    | Backend Services  |
                                         | (Deployment + |                                    | (API, Auth, etc.) |
-                                        | Service) |                                         | (Pods + Services) |
+                                        | Service)      |                                    | (Pods + Services) |
                                         +---------------+                                    +-------------------+
 
 ````
@@ -54,40 +54,59 @@
 
 ---
 
-🖥️ 1. Azure VM Provisioning
+## 1. VM Provisioning
+   
+   Create 2 vm (2vcpu and 4 GB Ram)
+   
+   i.Master
+   
+   ii.Worker
 
-Create 2 VMs
+   ### In Security Group Rules (NSG), Please make sure this rule enabled
 
-Role VM Name Private IP Public IP
-
-Master k8s-master 10.0.0.4 <master-public-ip>
-Worker k8s-worker1 10.0.0.5 <worker-public-ip>
-
-
-Security Group Rules (NSG)
-
-Master Node NSG
-
-Port Description
-
-22 SSH
-6443 Kubernetes API
-10248-10260 Kubelet
-443 HTTPS
-80 HTTP
-NodePort Range 30000–32767 Required
-31177 Ingress NodePort
-30692 HTTPS NodePort
-
-
-Worker Node NSG
-
-Same NodePort + 80/443 allowed.
+      ```
+      Master Node NSG
+      ---------------
+      Port Protocol Description
+      22 TCP SSH Access
+      6443 TCP Kubernetes API Server
+      10250 TCP Kubelet API
+      179 TCP/UDP Calico BGP
+      
+      Worker Node NSG
+      ---------------
+      Port Protocol Description
+      22 TCP SSH Access
+      10250 TCP Kubelet API
+      30000-32767 TCP NodePort Range
+      ```
 
 
 ---
 
-⚙️ 2. Install Kubernetes Components
+⚙️ 2. Install Dependencies on Both VMs
+
+    ```bash
+        sudo apt-get update
+        sudo apy-get install -y apt-transport-https ca-certificates curl
+    ```
+
+### Disable Swap
+    ```bash
+    sudo swapoff -a
+    sudo sed -i '/ swap / s/^/#/' /etc/fstab
+    sudo modprobe overlay
+    sudo modprobe br_netfilter
+    cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+    net.bridge.bridge-nf-call-iptables = 1
+    net.ipv4.ip_forward = 1
+    net.bridge.bridge-nf-call-ip6tables = 1
+    EOF
+    sudo sysctl --system
+    ```
+
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
 
 On all Nodes
 
