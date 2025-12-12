@@ -52,6 +52,12 @@
 
 
 
+
+
+
+
+
+
 ---
 
 ## 1. VM Provisioning
@@ -84,226 +90,142 @@
 
 ---
 
-⚙️ 2. Install Dependencies on Both VMs
-
-    ```bash
-        sudo apt-get update
-        sudo apy-get install -y apt-transport-https ca-certificates curl
-    ```
-
-### Disable Swap
-    ```bash
-    sudo swapoff -a
-    sudo sed -i '/ swap / s/^/#/' /etc/fstab
-    sudo modprobe overlay
-    sudo modprobe br_netfilter
-    cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
-    net.bridge.bridge-nf-call-iptables = 1
-    net.ipv4.ip_forward = 1
-    net.bridge.bridge-nf-call-ip6tables = 1
-    EOF
-    sudo sysctl --system
-    ```
-
+## ⚙️ 2. Install Dependencies on Both VMs
+```bash
+sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+```
+### Disable Swap
 
-
-On all Nodes
-
-sudo apt update
-sudo apt install -y apt-transport-https curl
+```bash
+sudo modprobe overlay
 sudo modprobe br_netfilter
+cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+EOF
+sudo sysctl --system
+```
 
-Install Containerd
-
-sudo apt install -y containerd
-containerd config default | sudo tee /etc/containerd/config.toml >/dev/null
+### Install containerd
+```bash
+sudo apt-get update
+sudo apt-get install -y containerd
+# Create default containerd config and restart
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+# Use systemd cgroup driver (recommended for kubeadm)
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 sudo systemctl restart containerd
+sudo systemctl enable containerd
+```
 
-Install kubeadm, kubelet, kubectl
-
+### Install Kubeadm, Kubelet, Kubectl (on all nodes)
+```bash
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key [pkgs.k8s.io]   | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] \
+https://pkgs.k8s.io/core:/stable:/v1.29/deb/ [pkgs.k8s.io] /"   | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
+kubeadm version
+kubelet --version
+kubectl version --client
+```
 
+## ⚙️ 3. Initialize the Kubernetes Master(Only on Master node)
+```bash
+#Initialize the control plane(run only on master)
+sudo kubeadm init   --pod-network-cidr=10.244.0.0/16 [10.244.0.0]   --apiserver-advertise-address=10.0.0.4   --node-name master
+```
+After sucess
+### Configure kubectl for the ubuntu user(on master)
 
----
-
-🚀 3. Initialize the Master Node
-
-sudo kubeadm init --pod-network-cidr=10.244.0.0/16 [10.244.0.0]
-
-Save the join command.
-
-Setup kubectl for Master
-
+```bash
 mkdir -p $HOME/.kube
 sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
 
+## ⚙️ 4. Install Pod Network(Calico/Flannel) on Master
+```bash
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+```
 
----
+## ⚙️ 5. Join Worker Node
+This command you will get after Initialize the control plane, you need to copy it
+```bash
+kubeadm join <master-ip>:6443 --token <token> \
+  --discovery-token-ca-cert-hash sha256:<hash>
+```
+  
+#If you miss to copy then please again recreate it
+sudo kubeadm token create --print-join-command
 
-🌐 4. Install Flannel CNI
-
-kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml [github.com]
-
-
----
-
-🔗 5. Join Worker Node
-
-Run the command given by kubeadm:
-
-sudo kubeadm join <master-ip>:6443 --token <token> --discovery-token-ca-cert-hash sha256:<hash>
-
-
----
-
-✔️ 6. Verify Cluster
-
+Run this to verify:
+```bash
 kubectl get nodes
-kubectl get pods -A
+```
 
+## 📥6 **Clone the Repository**
+```bash
+git clone https://github.com/amirulhaque/Kubernetes-projects.git
+cd manual-k8s-cluster-setup
+```
+After cloning you will find two script build.sh and deploy.sh
 
----
+If you want to build docker image on that case you have to change manifest file and please provide your dockerhub username
+or you can use the existing image which is push into docker hub just by running
+```bash
+./deploy.sh
+kubectl get pods -n microshop
+```
 
-🌍 7. Install Ingress-NGINX (Bare Metal mode)
+It will create all pod, deployment and services into cluster
 
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/baremetal/deploy.yaml [raw.githubusercontent.com]
+## ⚙️ 7. Install Nginx Ingress Controller
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+```
 
+Check:-
+```bash
+kubectl apply ingress.yaml
+kubectl get pods -n ingress-nginx
+```
 
----
+## ⚙️ 8.Create Azure Load Balancer (Static Public IP)
 
-🟦 8. Configure Azure Load Balancer
+Go to Azure → Create Load Balancer
 
-Backend Pool
+Backend Pool = Kubernetes Nodes
 
-Add:
+Health Probe = port 80
 
-Master (10.0.0.4)
+**Forwarding rule:**
 
-Worker1 (10.0.0.5)
+Port 80 → NGINX Ingress Controller Service (NodePort)
 
-
-Health Probe
-
-Protocol: TCP
-
-Port: 80
-
-
-Load Balancer Rule
-
-LB Port Backend Port Purpose
-
-80 31177 Ingress HTTP
-443 30692 Ingress HTTPS
-
-
-
----
-
-📝 9. DNS Configuration
-
-Example (GoDaddy):
-
-Type Name Value
-
-A @ LoadBalancer IP (48.221.114.169)
-A www LoadBalancer IP
-
-
-
----
-
-🛠️ 10. Deploy Microservices
-
-kubectl apply -f k8-microservices/
-
-Make sure the microshop namespace exists.
-
-
----
-
-🌐 11. Create Ingress Rule
-
-microshop-ingress.yaml
-
-apiVersion: networking.k8s.io/v1 [networking.k8s.io]
-kind: Ingress
-metadata:
-  name: microshop-ingress
-  namespace: microshop
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target [nginx.ingress.kubernetes.io]: /
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: amirulhaq.world
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 80
-
-Apply:
-
-kubectl apply -f microshop-ingress.yaml
-
-
----
-
-🧪 12. Test Access
-
-From inside cluster
-
-curl -I http://amirulhaq.world [amirulhaq.world]
-
-From outside
-
-Open browser:
-
-http://amirulhaq.world [amirulhaq.world]
-
-
----
-
-🐞 13. Troubleshooting
-
-Check Ingress Logs
-
-kubectl logs -n ingress-nginx -l app.kubernetes.io/component=controller [app.kubernetes.io]
-
-Check NodePort
-
+Get ingress controller NodePort:
+```bash
 kubectl get svc -n ingress-nginx
+```
 
-Check LB health probe
+## Connect Domain → Load Balancer IP
 
-Use:
+Go to your domain provider (Namecheap / GoDaddy)
 
-curl http://<node-ip>:31177
+**Create A-record:**
+
+Host: @
+Value: <Azure LB Public IP>
+TTL: 300
 
 
----
-
-🎉 14. Final Result
-
-You now have:
-
-✔ Manually installed Kubernetes cluster (kubeadm + containerd)
-✔ Flannel networking
-✔ NGINX Ingress Controller
-✔ Azure Load Balancer with public IP
-✔ DNS with custom domain
-✔ Deployed microservices
-✔ Publicly accessible website
-
-👉 Access: http://amirulhaq.world [amirulhaq.world]
+**Access Your Application**
+http://amirulhaq.world
 
 
 ---
